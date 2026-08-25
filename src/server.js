@@ -12,12 +12,25 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://amazon-frontend-psi.vercel.app",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://amazon-frontend-psi.vercel.app",
-    ],
+    origin: (origin, callback) => {
+      // Allow requests without Origin
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked: ${origin}`));
+    },
     credentials: true,
   })
 );
@@ -25,14 +38,16 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// API routes
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Amazon Clone API is running perfectly! 🚀",
+  });
+});
+
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
-
-app.get("/", (req, res) => {
-  res.send("Amazon Clone API is running perfectly! 🚀");
-});
 
 export default app;
