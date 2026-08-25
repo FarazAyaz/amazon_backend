@@ -14,7 +14,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://amazon-frontend-psi.vercel.app",
+  "https://amazonfaraz.netlify.app",
 ];
 
 app.use(
