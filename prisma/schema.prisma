@@ -1,10 +1,13 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql" 
+  provider = "postgresql"
 }
+
+
 
 // 1. USER (Gahak aur Admin)
 model User {
