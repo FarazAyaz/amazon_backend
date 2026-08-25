@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" 
+}
+
+// 1. USER (Gahak aur Admin)
+model User {
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique
+  password  String
+  role      String     @default("USER")
+  createdAt DateTime   @default(now())
+  
+  cart      Cart?      // User ki ek hi main Tokri hogi
+  orders    Order[]    // User ke pichle orders ki history
+}
+
+// 2. PRODUCT (Jo cheezein bikengi)
+model Product {
+  id          Int         @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  image       String
+  category    String
+  stock       Int         @default(10)
+  createdAt   DateTime    @default(now())
+  
+  cartItems   CartItem[]  // Yeh product kis kis ki tokri mein hai
+  orderItems  OrderItem[]
+}
+
+// 3. CART (Shopping Cart / Main Tokri)
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique // Ek user ki ek hi tokri hogi
+  user      User       @relation(fields: [userId], references: [id])
+  
+  items     CartItem[] // Is tokri ke andar kya kya rakha hai
+}
+
+// 4. CART ITEM (Tokri ke andar ka saman)
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int      @default(1)
+  
+  // Ab yeh seedha Cart se jura hai, User se nahi
+  cartId    Int
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+// 5. ORDER (Jab user payment kar deta hai toh order banta hai)
+model Order {
+  id          Int         @id @default(autoincrement())
+  totalPrice  Float
+  status      String      @default("PENDING")
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+}
+
+// 6. ORDER ITEM (Bill ki raseed ke andar likhi cheezein)
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  price     Float    // Us waqt price kya thi
+  
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id])
+  
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+}
